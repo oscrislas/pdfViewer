@@ -1,17 +1,41 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <div class="row">
+      <div class="col-6">
+        <h1>
+        con embeded
+        </h1>
+          <pdf></pdf>
+      </div>
+
+      <div class="col-6">
+      <h1>
+      con cancas
+      </h1>
+        <canbas></canbas>
+      </div>
+  </div>
+  <div>
+
+  </div>
+
+
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
-
+import pdf from '@/components/WebViewer.vue'
+import canbas from '@/components/Canvasviewer.vue'
+ 
 export default {
   name: 'App',
   components: {
-    HelloWorld
+    pdf,
+    canbas
+  },
+
+  mounted() {
+
   }
 }
 </script>

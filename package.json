@@ -5,11 +5,19 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint",
+    "download-webviewer": "npx @pdftron/webviewer-downloader"
   },
   "dependencies": {
+    "bootstrap": "^4.4.1",
+    "bootstrap-vue": "^2.13.1",
+    "canvas": "^2.6.1",
     "core-js": "^3.6.4",
-    "vue": "^2.6.11"
+    "pdfjs": "^2.3.6",
+    "pdfjs-dist-viewer-min": "^2.4.456",
+    "vue": "^2.6.11",
+    "vue-pdf": "^4.0.8",
+    "webviewer-downloader": "^1.0.0"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.3.0",

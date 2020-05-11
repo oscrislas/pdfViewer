@@ -13,10 +13,9 @@ export default {
     name: 'multiple',
     data(){
         return {
-            l: ['http://mozilla.github.io/pdf.js/web/compressed.tracemonkey-pldi-09.pdf','https://cdn.rawgit.com/mozilla/pdf.js/c6e8ca86/test/pdfs/calrgb.pdf'],
-            index: 0
+            l: ['http://mozilla.github.io/pdf.js/web/compressed.tracemonkey-pldi-09.pdf',
+            'https://cdn.rawgit.com/mozilla/pdf.js/c6e8ca86/test/pdfs/calrgb.pdf'],
         }
-
     },
     components:{
         vueViewer

@@ -1,47 +1,35 @@
 <template>
-  
   <div>
-
-
-        <pdf :src="src" style="display: inline-block; width: 100%" :page="i" v-for=" i of numPages" :key="i"  ></pdf>
-        
-
+    <pdf :src="src" style="display: inline-block; width: 100%" :page="i" v-for=" i of numPages" :key="i"  ></pdf>  
   </div>
-
 </template>
 
 <script>
-
 import pdf from 'vue-pdf'
-
 
 export default {
   name: 'viwerPDF',
   props:['address'],
-  components: {
-        
+  components: {      
         pdf
     },
     data(){
       return{
-
         src: null,
         numPages: undefined,
-
       }
     },
     mounted() {
-     
-     this.src = pdf.createLoadingTask(this.address);
-		this.src.then(pdf => {
-    this.numPages = pdf.numPages;
-    })
+      this.src = pdf.createLoadingTask(this.address)
+      
+      this.src.then(pdf => {
+        this.numPages = pdf.numPages;
+      })
  
 	}
 }
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 
 h3 {

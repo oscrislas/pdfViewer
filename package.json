@@ -13,6 +13,7 @@
     "bootstrap-vue": "^2.13.1",
     "canvas": "^2.6.1",
     "core-js": "^3.6.4",
+    "pdf-merger-js": "^3.0.1",
     "pdfjs": "^2.3.6",
     "pdfjs-dist-viewer-min": "^2.4.456",
     "vue": "^2.6.11",

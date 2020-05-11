@@ -1,13 +1,22 @@
 <template>
-  <div class="tam"> 
-    <canvas id="the-canvas" style="border:1px solid black"></canvas>
+
+  <div  > 
+<div class="tam">
+    <canvas id="the-canvas" style=" border:1px solid black;" width="auto" height="800px"></canvas>
+</div>
+
+<div>
             <div>
-            <button v-on:click="addWidth">Previous</button>
-            <button v-on:click="load">Next</button>
-            &nbsp; &nbsp;
-            <span>Page: <span id="page_num"></span> / <span id="page_count"></span></span>
+            <button v-on:click="pageNum--">Previous</button>
+            <button v-on:click="pageNum++">Next</button>
+            <button v-on:click="scale=scale+0.1">Zoom +</button>
+            <button v-on:click="scale=scale-0.1">Zoom -</button>
+            <button v-on:click="offsetx=offsetx+10">x -</button>
+            <p class="text-white">Page: {{pageNum}} / {{totalPageCount}}</p>
             </div>
+</div>
   </div>
+  
 </template>
 
 <script>
@@ -31,60 +40,70 @@ export default {
       rectWidth: 0,
       pageRendering: false,
       current :{},
-      scale : 0.8,
+      scale : 1,
       pageNumPending : null,
-      pageNum : 1
+      pageNum : 1,
+      offsetx :0,
+      offsety : 0
     }
   },
   mounted() {
     var canvas = document.getElementById('the-canvas')
     var ctx= canvas.getContext('2d')
+    
     this.vueCanvas = ctx
-
+ console.log(this.vueCanvas)
+    this.load()
+       
+  },
+  watch:{
+    vueCanvas(){
+//this.renderPage(this.pageNum)
+console.log("vue canvas")
+    },
+    pageNum(){
+      if (this.pageNum >= this.totalPageCount && this.current.documentIndex + 1 === this.pdfDocs.length) {
+         this.pageNum=this.totalPageCount
+          return ;
+      }
+      if (this.pageNum <= 1) {
+        this.pageNum=1
+            return;
+      }
+      this.queueRenderPage(this.pageNum);
+    },
+    scale(){
+      this.queueRenderPage(this.pageNum);
+    },
+    offsetx(){
+      this.queueRenderPage(this.pageNum);
+    }
 
   },
   methods: {
-        addWidth() {
-      this.rectWidth += 10
-      this.drawRect()
-    },
-    subWidth() {
-      this.rectWidth -= 10
-      this.drawRect()      
-    },
-      drawRect() {
-      // clear canvas
-      this.vueCanvas.clearRect(0, 0, 900, 900);
-      
-      
-      // draw rect
-      this.vueCanvas.beginPath();
-      this.vueCanvas.rect(this.rectWidth, 0, this.rectWidth+20, 20);
-      this.vueCanvas.fill()
-      this.vueCanvas.stroke();    
-        
-    },
    load() {
     // Load PDFs one after another
-    var _this=this
-    PDFJS.getDocument(_this.urls[_this.loadedCount])
-    .promise.then(function (pdfDoc_) {
-        console.log('loaded PDF ' + _this.loadedCount);
-        _this.pdfDocs.push(pdfDoc_);
-        _this.loadedCount++;
-        if (_this.loadedCount !== _this.urls.length) {
+  
+    PDFJS.getDocument(this.urls[this.loadedCount])
+    .promise.then(pdfDoc_=>{
+        console.log('loaded PDF ' + this.loadedCount);
+        
+        this.pdfDocs.push(pdfDoc_);
+        this.loadedCount++;
+        
+        if (this.loadedCount !== this.urls.length) {
           console.log("entro al if")
-            return _this.load();
+            return this.load();
         } 
         
         console.log('Finished loading');
-        _this.totalPageCount = _this.getTotalPageCount();
-        document.getElementById('page_count').textContent = _this.totalPageCount;
-
+        this.totalPageCount = this.getTotalPageCount();
+       
         // Initial/first page rendering
-        _this.renderPage(_this.pageNum);
+        this.renderPage(this.pageNum);
     });
-   }, 
+   },
+
    getTotalPageCount() {
     var totalPageCount = 0;
     for (var docIdx = 0; docIdx < this.pdfDocs.length; docIdx++) {
@@ -108,60 +127,62 @@ export default {
     },
 
     renderPage(num) {
-      var _this= this
+       console.log("entro a render")
 
-      console.log("entro a render")
-
-    _this.pageRendering = true;
-    _this.current = this.getPageInfo(num);
+    this.pageRendering = true;
+    this.current = this.getPageInfo(num);
     // Using promise to fetch the page
-    _this.pdfDocs[_this.current.documentIndex].getPage(_this.current.pageNumber).then(function (page) {
-        var viewport = page.getViewport({scale: _this.scale});
-        console.log( _this.current)
+    this.pdfDocs[this.current.documentIndex].getPage(this.current.pageNumber).then(page => {
+        var viewport = page.getViewport({scale: this.scale});
         
-        _this.setcanvas(viewport.height,viewport.width)
+        console.log("viewport : "+JSON.stringify(viewport))
+        this.vueCanvas.width=viewport.width
+        this.vueCanvas.height=viewport.height
         
-
+        viewport.offsetX=this.offsetx
+        console.log(JSON.stringify(viewport))
+        Object.assign(viewport, {offsetX: this.offsetx})
         // Render PDF page into canvas context
+        console.log( "canvas --"+this.vueCanvas.width,this.vueCanvas.height)
         var renderContext = {
-            canvasContext: _this.vueCanvas,
+            canvasContext: this.vueCanvas,
             viewport: viewport
         };
+
         var renderTask = page.render(renderContext);
 
         // Wait for rendering to finish
-        renderTask.promise.then(function () {
-            _this.pageRendering = false;
-            if (_this.pageNumPending !== null) {
+        renderTask.promise.then(() =>{
+            this.pageRendering = false;
+            if (this.pageNumPending !== null) {
                 // New page rendering is pending
-                this.renderPage(_this.pageNumPending);
-                _this.pageNumPending = null;
+                this.renderPage(this.pageNumPending);
+                this.pageNumPending = null;
             }
         });
     });
 
-    // Update page counters
-     document.getElementById('page_num').textContent = this.pageNum;
-},
-setcanvas(width,height){
-  console.log("sent vue canvas")
-  this.vueCanvas.width=width
-  this.vueCanvas.height=height
-}
+    },
 
-
-    
+    queueRenderPage(num) {
+        if (this.pageRendering) {
+            this.pageNumPending = num;
+        } else {
+            this.renderPage(num);
+        }
+    }
   },
-
-
 }
 </script>
 
 <style scoped>
 .tam{
-  width: 100%;
-  height: 500px;
-  background-color: black;
-}
+    display:block;
+    overflow: auto;
+    background: #333;
+    text-align: center;
+    border: solid 3px;
+  }
+
 </style>>
 

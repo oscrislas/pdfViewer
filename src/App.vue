@@ -1,14 +1,14 @@
 <template>
   <div id="app">
   <div class="row">
-      <div class="col-12 ">
+      <div class="col-6 ">
         <h1>
         con embeded
         </h1>
           <pdf class="medida"></pdf>
       </div>
 
-      <div class="col-12 ">
+      <div class="col-6 ">
       <h1>
       con vue-pdf
       <multiple class="medida"/>
@@ -62,7 +62,7 @@ export default {
 }
 .medida{
   margin: auto;
-  width: 900px;
+  width: 100%;
   height: 1200px;
 }
 </style>

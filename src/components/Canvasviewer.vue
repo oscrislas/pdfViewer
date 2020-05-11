@@ -2,7 +2,7 @@
 
   <div  > 
 <div class="tam">
-    <canvas id="the-canvas" style=" border:1px solid black;" width="auto" height="800px"></canvas>
+    <canvas id="the-canvas" style=" border:1px solid black;" :width="width" :height="height"></canvas>
 </div>
 
 <div>
@@ -11,8 +11,8 @@
             <button v-on:click="pageNum++">Next</button>
             <button v-on:click="scale=scale+0.1">Zoom +</button>
             <button v-on:click="scale=scale-0.1">Zoom -</button>
-            <button v-on:click="offsetx=offsetx+10">x -</button>
-            <p class="text-white">Page: {{pageNum}} / {{totalPageCount}}</p>
+            <button v-on:click="offsetx=offsetx+.2">x -</button>
+            <p class="text-dark">Page: {{pageNum}} / {{totalPageCount}}</p>
             </div>
 </div>
   </div>
@@ -44,7 +44,9 @@ export default {
       pageNumPending : null,
       pageNum : 1,
       offsetx :0,
-      offsety : 0
+      offsety : 0,
+      width: 100,
+      height: 100
     }
   },
   mounted() {
@@ -77,8 +79,7 @@ console.log("vue canvas")
     },
     offsetx(){
       this.queueRenderPage(this.pageNum);
-    }
-
+    },
   },
   methods: {
    load() {
@@ -133,17 +134,18 @@ console.log("vue canvas")
     this.current = this.getPageInfo(num);
     // Using promise to fetch the page
     this.pdfDocs[this.current.documentIndex].getPage(this.current.pageNumber).then(page => {
-        var viewport = page.getViewport({scale: this.scale});
-        
-        console.log("viewport : "+JSON.stringify(viewport))
+    var viewport = page.getViewport({scale: this.scale});
+   
+                console.log("viewport : "+JSON.stringify(viewport))
+
         this.vueCanvas.width=viewport.width
         this.vueCanvas.height=viewport.height
-        
-        viewport.offsetX=this.offsetx
-        console.log(JSON.stringify(viewport))
-        Object.assign(viewport, {offsetX: this.offsetx})
+        this.height=viewport.height
+        this.width=viewport.width
+      
+ viewport.scale=this.offsetx;
         // Render PDF page into canvas context
-        console.log( "canvas --"+this.vueCanvas.width,this.vueCanvas.height)
+
         var renderContext = {
             canvasContext: this.vueCanvas,
             viewport: viewport
